@@ -36,6 +36,7 @@ function build_instrumentmodel_mixed(hier, file)
                         gain_amp_override = (;
                             LM = IIDSitePrior(IntegSeg(), Normal(0.0, 2.0)),
                             NN = IIDSitePrior(IntegSeg(), Normal(0.0, 0.5)),
+                            GL = IIDSitePrior(IntegSeg(), Normal(0.0, 2.0)),
                             SM = IIDSitePrior(IntegSeg(), Normal(0.0, 0.5)),
                         ),
                     )

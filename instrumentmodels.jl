@@ -499,10 +499,22 @@ function build_instrument_mixed(; gainamp_sigma=0.4, frcal=false, gain_amp_overr
         gpR=ArrayPrior(IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(π^2))); refant=SEFDReference(0.0), phase=true),
         gprat=ArrayPrior(IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.1^2))); SMA=IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.5^2))), phase=true),
         gpratμ=ArrayPrior(IIDSitePrior(TrackSeg(), DiagonalVonMises(0.0, inv(π^2)))),
-        dRre=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); ALMA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01))),
-        dRim=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); ALMA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01))),
-        dLre=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); ALMA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01))),
-        dLim=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); ALMA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01))),
+        dRre=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); 
+                        ALMA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01)),
+                        HAY = IIDSitePrior(TrackSeg(), Normal(0.0, 0.05))
+                        ),
+        dRim=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); 
+                        ALMA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01)),
+                        HAY = IIDSitePrior(TrackSeg(), Normal(0.0, 0.05))
+                        ),
+        dLre=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); 
+                        ALMA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01)),
+                        HAY = IIDSitePrior(TrackSeg(), Normal(0.0, 0.05))
+                        ),
+        dLim=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); 
+                        ALMA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01)),
+                        HAY = IIDSitePrior(TrackSeg(), Normal(0.0, 0.05))
+                        ),
     )
 
     return InstrumentModel(J, intprior)
@@ -530,7 +542,7 @@ function build_instrument_mixed_uv(; gainamp_sigma=0.2, frcal=false, gain_amp_ov
         ),
         gprat=ArrayPrior(
             IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.1^2))); 
-            SM=IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.5^2))), phase=true
+            SW=IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.5^2))), phase=true
         ),
         gpratμ=ArrayPrior(IIDSitePrior(TrackSeg(), DiagonalVonMises(0.0, inv(π^2)))),
         dRre=ArrayPrior(IIDSitePrior(TrackSeg(), Normal(0.0, 0.2)); AA=IIDSitePrior(TrackSeg(), Normal(0.0, 0.01))),
@@ -560,7 +572,7 @@ function build_instrument_hopspc_uv(; gainamp_sigma=0.2, frcal=false, gain_amp_o
         gpR=ArrayPrior(IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(π^2))); refant=SEFDReference(0.0), phase=true),
         gprat=ArrayPrior(
                     IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.1^2))); 
-                    SM=IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.5^2))), 
+                    SW=IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.5^2))), 
                     refant=SingleReference(:AA, 0.0), phase=true
                 ),
         gpratμ=ArrayPrior(
@@ -594,7 +606,7 @@ function build_instrument_hopspc_uv2(; gainamp_sigma=0.2, frcal=false, gain_amp_
         gpR=ArrayPrior(IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(π^2))); refant=SEFDReference(0.0), phase=true),
         gprat=ArrayPrior(
                     IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.1^2))); 
-                    SM=IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.5^2))), 
+                    SW=IIDSitePrior(IntegSeg(), DiagonalVonMises(0.0, inv(0.5^2))), 
                     refant=SingleReference(:AA, 0.0), phase=true
                 ),
         gpratμ=ArrayPrior(

@@ -26,8 +26,14 @@ include(joinpath(@__DIR__, "deps.jl"))
 - `--nadapt::Int`: Number of adaptation steps (default is `10_000`).
 - `--maxiters::Int`: Maximum number of iterations (default is `25_000`).
 - `--ntrials::Int`: Number of trials (default is `5`).
-- `--uvmin::Float64`: Minimum uvdistance in meters to use (default is `0.0`).
 - `--ferr::Float64`: Fractional noise to add to the coherencies (default is `0.005`).
+- `--flagtable::String`: Path to a TOML flag table. Supported top-level keys (all optional):
+                         `corr_polbasis = ["HAY", "AA"]` — sites whose polbasis label is flipped;
+                         `sites = ["AP"]` — drop all baselines touching these;
+                         `baselines = [["AA","LM"]]` — drop these specific (order-independent) baselines;
+                         `tranges = [[4.5, 5.2]]` — drop datums with Ti in these UT-decimal-hour ranges;
+                         `uvranges = [[0.0, 0.1]]` — drop datums with uvdist in these Gλ ranges.
+                         Default `""` (no-op).
 - `--avg::String`: Timescale of averaging. Can either be "scan" or a number in seconds (default is `"scan"`).
 - `--order::Int`: Order of the GMRF (default is `2`).
 - `--mean::String`: The type of mean model to use for the sky model. Options are `GaussBkgd`, `Bkgd`, and `Gauss` (default is `GaussBkgd`).
@@ -54,7 +60,8 @@ Comonicon.@main function main(
         x0::Float64 = 0.0, y0::Float64 = 0.0,
         nsample::Int = 20_000, nadapt::Int = 10_000,
         maxiters::Int = 10_000, ntrials::Int = 5,
-        uvmin::Float64 = 0.0, ferr::Float64 = 0.005,
+        ferr::Float64 = 0.005,
+        flagtable::String = "",
         order::Int = 2,
         mean::String = "Bkgd",
         restart::Bool = false,
@@ -73,7 +80,7 @@ Comonicon.@main function main(
     @info "PA of the grid $(pa) degrees"
     @info "Adding $ferr fractional error to the data"
 
-        if order == 1
+    if order == 1
         base = GMRF
     elseif order > 1
         base = NonCenteredMRF(GMRF)
@@ -138,12 +145,18 @@ Comonicon.@main function main(
 
     if endswith(file, ".uvf") || endswith(file, ".uvfits")
         @info "Loading a UVFITS file"
-        dcoh = build_data_uvfits(file, array; avg, uvmin, ferr, trange, mixed)
+        dcoh = build_data_uvfits(file, array; avg, ferr, trange)
     elseif endswith(file, ".dlist")
         @info "Loading a dlist file"
-        dcoh = build_data_dlist(file, array; avg, uvmin, ferr, trange, mixed)
+        dcoh = build_data_dlist(file, array; avg, ferr, trange)
     else
         throw(ArgumentError("Unknown file type: $file"))
+    end
+
+    if flagtable != ""
+        @info "Reading flag table from $flagtable"
+        cfg = read_flagtable(flagtable)
+        dcoh = apply_flagtable(dcoh, cfg)
     end
 
     if addgauss
@@ -180,6 +193,9 @@ Comonicon.@main function main(
             μas2rad(x0), μas2rad(y0), posang=deg2rad(pa),
             executor = ex
             )
+
+
+    @info "Beamsize relative to the pixel size is $(beamsize(dcoh)/pixelsizes(g).X) pixels"
     
 
     if mean == "GaussBkgd"
@@ -216,7 +232,7 @@ Comonicon.@main function main(
         imgdata = (Comrade.ImgNormalData(rad2μas∘fast_centroid, SVector(0.0, 0.0), 1.0),)
     end
 
-    skym = SkyModel(msky, skyprior(msky), g; algorithm = FINUFFTAlg(; threads = 1))
+    skym = SkyModel(msky, skyprior(msky), g; algorithm = FINUFFTAlg(; threads = Threads.nthreads()))
 
     if mixed
         intm = build_instrumentmodel_mixed(hier, endswith(file, ".dlist"))
