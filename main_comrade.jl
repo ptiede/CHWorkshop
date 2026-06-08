@@ -32,7 +32,7 @@ include(joinpath(@__DIR__, "deps.jl"))
                          `sites = ["AP"]` — drop all baselines touching these;
                          `baselines = [["AA","LM"]]` — drop these specific (order-independent) baselines;
                          `tranges = [[4.5, 5.2]]` — drop datums with Ti in these UT-decimal-hour ranges;
-                         `uvranges = [[0.0, 0.1]]` — drop datums with uvdist in these Gλ ranges.
+                         `uvranges = [[0.0, 5.0e7]]` — drop datums with uvdist in these ranges, in λ (NOT Gλ; 0.05 Gλ = 5.0e7).
                          Default `""` (no-op).
 - `--avg::String`: Timescale of averaging. Can either be "scan" or a number in seconds (default is `"scan"`).
 - `--order::Int`: Order of the GMRF (default is `2`).

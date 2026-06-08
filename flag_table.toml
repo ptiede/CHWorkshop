@@ -1,0 +1,35 @@
+# Example flag table for main_comrade.jl --flagtable
+#
+# All keys are optional; an empty file is a valid no-op. Rules are applied in
+# the order: corr_polbasis, sites, baselines, tranges, uvranges. Comments are a
+# good place to record *why* a cut was made.
+
+# Sites whose polbasis label should be flipped (labeled circular but actually
+# linear). :HAY is no longer corrected implicitly — list it here if needed.
+# Add "AA" as well when running mixed-basis data (ALMA not yet polconverted).
+#corr_polbasis = [""]
+
+# Drop every baseline touching any of these sites.
+# Use the site codes matching your data format: 2-letter (AA, LM, SM, NN, ...)
+# for UVFITS, longer codes (ALMA, LMT, SMA, NOEMA, ...) for .dlist.
+#sites = ["AP"]
+
+# Drop these specific baselines. Order-independent: ["AA","LM"] == ["LM","AA"].
+#baselines = [
+#    ["AA", "LM"],
+#    ["SM", "NN"],
+#]
+
+# Drop datums whose Ti falls in any of these UT decimal-hour ranges.
+#tranges = [
+#    [4.5, 5.2],
+#    [10.0, 11.0],
+#]
+
+# Drop datums whose uvdist falls in any of these ranges. Units are λ (U/V are
+# stored in wavelengths, NOT Gλ) — there is no scaling in the code. So 0.05 Gλ
+# is 5.0e7. This is the replacement for the old --uvmin flag; the range below
+# kills the shortest baselines (< 0.05 Gλ).
+uvranges = [
+    [0.0, 5.0e7],
+]
